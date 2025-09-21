@@ -1,0 +1,22 @@
+- name: Install and run redis
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install redis
+      ansible.builtin.dnf:
+        name: redid
+        state: present
+
+    - name: Update the redis listen address to
+      ansible.builtin.replace:
+        path: /etc/redis/redis.conf
+        regexp: '127.0.0.1'
+        replace: '0.0.0.0'
+
+    - name: Enable and start redis service
+      ansible.builtin.service:
+        name: redis
+        state: started
+        enabled: true
+        
