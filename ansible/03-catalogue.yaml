@@ -3,14 +3,14 @@
   become: true
 
   tasks:
-    - name: Disable old nodejs and enable new nodejs
-      ansible.builtin.shell: 
-        cmd: dnf module disable nodejs -y && dnf module enable nodejs:18 -y
+    # - name: Disable old nodejs and enable new nodejs
+    #   ansible.builtin.shell: 
+    #     cmd: dnf module disable nodejs -y && dnf module enable nodejs:18 -y
 
-    - name: Install NodeJS
-      ansible.builtin.dnf:
-        name: nodejs
-        state: present
+    # - name: Install NodeJS
+    #   ansible.builtin.dnf:
+    #     name: nodejs
+    #     state: present
 
     - name: Create linux user
       ansible.builtin.user:
