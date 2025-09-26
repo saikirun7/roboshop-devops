@@ -1,14 +1,28 @@
-- name: Install and run redis
+- name: Install and run redis from Remi repo
   hosts: web
   become: true
 
   tasks:
-    - name: Install redis
+    - name: Install prerequisites
       ansible.builtin.dnf:
-        name: redis
+        name:
+          - yum-utils
+          - epel-release
         state: present
 
-    - name: Update the redis listen address to
+    - name: Enable Remi repository
+      ansible.builtin.shell: |
+        dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+      args:
+        creates: /etc/yum.repos.d/remi.repo
+
+    - name: Install redis from Remi repo
+      ansible.builtin.dnf:
+        name: redis
+        enablerepo: remi
+        state: present
+
+    - name: Update the redis listen address
       ansible.builtin.replace:
         path: /etc/redis/redis.conf
         regexp: '127.0.0.1'
@@ -19,4 +33,3 @@
         name: redis
         state: started
         enabled: true
-        
