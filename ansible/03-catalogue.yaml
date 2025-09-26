@@ -3,9 +3,9 @@
   become: true
 
   tasks:
-    - name: disable old nodejs and enable new nodejs
+    - name: Disable old nodejs and enable new nodejs
       ansible.builtin.shell: 
-        dnf module disable nodejs -y && dnf module enable nodejs:18 -y
+        cmd: dnf module disable nodejs -y && dnf module enable nodejs:18 -y
 
     - name: Install NodeJS
       ansible.builtin.dnf:
@@ -21,7 +21,7 @@
         path: /app
         state: directory
 
-    - name: downlaod catalogue application
+    - name: Download catalogue application
       ansible.builtin.get_url:
         url: https://roboshop-builds.s3.amazonaws.com/catalogue.zip
         dest: /tmp/catalogue.zip
@@ -35,7 +35,7 @@
     - name: Install the dependencies
       ansible.builtin.command: npm install
       args:
-        chdir=/app
+        chdir: /app
     
     - name: Copy catalogue service file
       ansible.builtin.copy:
@@ -57,8 +57,8 @@
         name: mongodb-mongosh
         state: present
 
-    - name: start and enable catalogue
-      ansinble.builtin.service:
+    - name: Restart and enable catalogue service
+      ansible.builtin.service:
         name: catalogue
         state: restarted
-        enabled: yes
+        enabled: true
