@@ -1,20 +1,23 @@
-- name: Install node JS
+- name: Deploy catalogue service
   hosts: web
   become: true
 
   tasks:
-    # - name: Disable old nodejs and enable new nodejs
-    #   ansible.builtin.shell: 
-    #     cmd: dnf module disable nodejs -y && dnf module enable nodejs:18 -y
+    - name: Check if Node.js is installed
+      ansible.builtin.command: node -v
+      register: node_version
+      ignore_errors: yes
 
-    # - name: Install NodeJS
-    #   ansible.builtin.dnf:
-    #     name: nodejs
-    #     state: present
+    - name: Install Node.js 18 if missing
+      ansible.builtin.shell: |
+        curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+        dnf install -y nodejs
+      when: node_version.rc != 0
 
-    - name: Create linux user
+    - name: Create linux user if not exists
       ansible.builtin.user:
         name: catalogue
+        state: present
 
     - name: Create application directory
       ansible.builtin.file:
@@ -25,18 +28,18 @@
       ansible.builtin.get_url:
         url: https://roboshop-builds.s3.amazonaws.com/catalogue.zip
         dest: /tmp/catalogue.zip
-    
+
     - name: Unarchive the application
       ansible.builtin.unarchive:
         src: /tmp/catalogue.zip
         dest: /app
         remote_src: yes
-    
+
     - name: Install the dependencies
       ansible.builtin.command: npm install
       args:
         chdir: /app
-    
+
     - name: Copy catalogue service file
       ansible.builtin.copy:
         src: catalogue.service
